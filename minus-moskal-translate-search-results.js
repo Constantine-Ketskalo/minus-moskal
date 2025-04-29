@@ -12,12 +12,12 @@
 
 (function() {
     'use strict';
-    
+
     // 1. Унікальні москальські літери
     const moskalUniqueLetters = ['ы', 'э', 'ё', 'ъ'];
 
     // 2. Часті москальські слова без унікальних літер
-    const moskalCommonWords = ['и', 'что', 'как', 'да', 'нет', 'она', 'они', 'из', 'с', 'к', 'года', 'также', 'или', 'будет', 'время', 'их', 'после', 'есть', 'более', 'только', 'еще', 'все', 'это', 'для', 'по', 'на', 'от', 'при', 'так', 'но', 'всегда', 'может', 'чтобы', 'если', 'тогда', 'где', 'когда', 'здесь', 'там'];
+    const moskalCommonWords = ['и', 'что', 'как', 'да', 'нет', 'она', 'они', 'из', 'с', 'к', 'года', 'также', 'или', 'будет', 'время', 'их', 'после', 'есть', 'более', 'только', 'еще', 'это', 'от', 'но', 'всегда', 'может', 'чтобы', 'если', 'тогда', 'где', 'когда', 'здесь'];
 
     const ismoskalDomain = (url) => {
         const hostname = new URL(url).hostname.toLowerCase();
@@ -68,7 +68,7 @@
     const redirectClickToTranslateLink = (result) => {
         const mainLinkElement = result.querySelector('a:not([hreftranslate])');
         const translatedLinkElement = result.querySelector('a[hreftranslate]');
-        
+
         let translateUrl = '/';
         let ping = null;
         if (translatedLinkElement && translatedLinkElement.getAttribute('hreftranslate') === 'uk') {
