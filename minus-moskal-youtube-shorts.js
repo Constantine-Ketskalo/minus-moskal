@@ -50,6 +50,13 @@
 
     // ################
 
+    const pauseVideo = () => {
+        const videoElement = document.querySelector('video');
+        if (videoElement) {
+            videoElement.pause();
+        }
+    }
+
     const addButtons = () => {
         const menu = document.querySelector('ytd-mini-guide-renderer');
 
@@ -65,7 +72,6 @@
 
         const videoAnchor = document.createElement('a');
         videoAnchor.href = '#';
-        // videoAnchor.style.color = 'pink';
         videoAnchor.style.textDecoration = 'none';
         videoAnchor.innerText = '🔥 відео';
 
@@ -73,7 +79,11 @@
 
         videoButtonWrapper.onclick = (event) => {
             event.preventDefault();
-            alert('🔥 Готово! Відео відзначено як москальське.');
+            pauseVideo();
+
+            if (confirm('Поскаржитись на москальське відео?')) {
+                alert('🔥 Готово! Відео відзначено як москальське.');
+            }
         };
 
         // Створюємо елемент кнопки "москальський канал"
@@ -84,7 +94,6 @@
 
         const channelAnchor = document.createElement('a');
         channelAnchor.href = '#';
-        // channelAnchor.style.color = 'pink';
         channelAnchor.style.textDecoration = 'none';
         channelAnchor.innerText = '🔥 канал';
 
@@ -92,7 +101,12 @@
 
         channelButtonWrapper.onclick = (event) => {
             event.preventDefault();
-            alert('🔥 Готово! Канал відзначено як москальський.');
+
+            pauseVideo();
+
+            if (confirm('Поскаржитись на москальське відео?')) {
+                alert('🔥 Готово! Канал відзначено як москальський.');
+            }
         };
 
         containerElement.appendChild(videoButtonWrapper);
