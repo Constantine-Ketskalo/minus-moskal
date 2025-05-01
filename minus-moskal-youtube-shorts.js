@@ -50,29 +50,56 @@
 
     // ################
 
-    const menu = document.querySelector('ytd-mini-guide-renderer');
+    const addButtons = () => {
+        const menu = document.querySelector('ytd-mini-guide-renderer');
 
-    /*<div class="anti-rus-button" style="position: absolute;cursor: pointer;width: 40px;height: 40px;background: green;margin: 15px;border-radius: 50%;text-align: center;top: auto;bottom: 0;"><a href="#">🔥 канал</a></div>*/
+        const containerElement = document.createElement('div');
+        containerElement.className = 'anti-rus-container';
+        containerElement.setAttribute('style', 'position: fixed;bottom: 0;top: auto;z-index: 9999;display: flex;flex-direction: column;align-items: center;justify-content: center;');
 
-    // Створюємо елемент кнопки
-    const buttonWrapper = document.createElement('div');
-    buttonWrapper.className = 'anti-rus-button';
-    buttonWrapper.setAttribute('style', 'position: absolute;cursor: pointer;width: 40px;height: 40px;background: green;margin: 15px;border-radius: 50%;text-align: center;top: auto;bottom: 0;');
-    buttonWrapper.style.cursor = 'pointer';
+        // Створюємо елемент кнопки "москальське відео"
+        const videoButtonWrapper = document.createElement('div');
+        videoButtonWrapper.className = 'anti-rus-button';
+        videoButtonWrapper.setAttribute('style', 'cursor: pointer;width: 40px;height: 40px;background: yellow;margin: 15px;border-radius: 50%;text-align: center;');
+        videoButtonWrapper.style.cursor = 'pointer';
 
-    const anchor = document.createElement('a');
-    anchor.href = '#';
-    anchor.style.color = 'pink';
-    anchor.innerText = '🔥 канал';
+        const videoAnchor = document.createElement('a');
+        videoAnchor.href = '#';
+        // videoAnchor.style.color = 'pink';
+        videoAnchor.style.textDecoration = 'none';
+        videoAnchor.innerText = '🔥 відео';
 
-    buttonWrapper.appendChild(anchor);
+        videoButtonWrapper.appendChild(videoAnchor);
 
-    // Обробник кліку (приклад)
-    buttonWrapper.onclick = (event) => {
-        event.preventDefault();
-        alert('🔥 Готово! Канал відзначено як москальський.');
-    };
-    
-    // Додаємо кнопку в кінець меню
-    menu.appendChild(buttonWrapper);
+        videoButtonWrapper.onclick = (event) => {
+            event.preventDefault();
+            alert('🔥 Готово! Відео відзначено як москальське.');
+        };
+
+        // Створюємо елемент кнопки "москальський канал"
+        const channelButtonWrapper = document.createElement('div');
+        channelButtonWrapper.className = 'anti-rus-button';
+        channelButtonWrapper.setAttribute('style', 'cursor: pointer;width: 40px;height: 40px;background: pink;margin: 15px;border-radius: 50%;text-align: center;');
+        channelButtonWrapper.style.cursor = 'pointer';
+
+        const channelAnchor = document.createElement('a');
+        channelAnchor.href = '#';
+        // channelAnchor.style.color = 'pink';
+        channelAnchor.style.textDecoration = 'none';
+        channelAnchor.innerText = '🔥 канал';
+
+        channelButtonWrapper.appendChild(channelAnchor);
+
+        channelButtonWrapper.onclick = (event) => {
+            event.preventDefault();
+            alert('🔥 Готово! Канал відзначено як москальський.');
+        };
+
+        containerElement.appendChild(videoButtonWrapper);
+        containerElement.appendChild(channelButtonWrapper);
+
+        menu.appendChild(containerElement);
+    }
+
+    addButtons();
 })();
