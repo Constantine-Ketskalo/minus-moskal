@@ -1,0 +1,42 @@
+{
+    "name": "Мінус москаль",
+    "version": "1.0",
+    "description": "Мінус москаль - це розширення для браузера, яке дозволяє зменшити кількість москальської мови в результатах пошуку гугл, а також допомагає легше звітувати та блокувати окремі відео, або цілі ютуб-канали на youtube shorts. Це розширення було першопочатково розроблене з ціллю доповнити існуючі розширення \"Лагідна українізація\" та \"Лагідна українізація для youtube shorts\". Це розширення є частиною проекту \"Лагідна українізація\" та \"stopRU\".",
+    "permissions": [],
+    "host_permissions": [
+        "https://www.youtube.com/*",
+        "https://www.google.com/search*",
+        "https://www.google.com.*/search*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "https://www.youtube.com/shorts*"
+            ],
+            "js": [
+                "handle_youtube_shorts.js"
+            ]
+        },
+        {
+            "matches": [
+                "https://www.google.com/search*",
+                "https://www.google.com.*/search*"
+            ],
+            "js": [
+                "handle_google_search.js"
+            ]
+        }
+    ],
+    "action": {
+        "default_icon": {
+            "16": "images/icon16.png",
+            "48": "images/icon48.png",
+            "128": "images/icon128.png"
+        },
+        "default_title": "Мінус москаль",
+        "default_popup": "popup.html"
+    }
+}
