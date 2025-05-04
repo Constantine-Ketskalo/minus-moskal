@@ -156,18 +156,6 @@ GM_addStyle(`
         return isLoggedIn;
     }
 
-    // function setReportProcessStarted() {
-    //     document.querySelector('ytd-player#player video').setAttribute('reporting-in-progress', true);
-    // }
-
-    // function setReportProcessFinished() {
-    //     document.querySelector('ytd-player#player video').removeAttribute('reporting-in-progress');
-    // }
-
-    // function isReportingInProgress() {
-    //     return document.querySelector('ytd-player#player video').hasAttribute('reporting-in-progress');
-    // }
-
     function markVideoAsReported() {
         document.querySelector('ytd-player#player video').classList.add('blocked-video');
         document.querySelector('.anti-moskal-button.video').classList.add('hidden-button');
