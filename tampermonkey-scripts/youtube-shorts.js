@@ -99,7 +99,9 @@ GM_addStyle(`
 (function() {
     'use strict';
 
-    console.log("I'm executud!", Date.now());
+    // ################################
+    // Оголошення коду
+    // ################################
 
     const elementLoadTimeout = 10000; // 10 секунд
     const elementLoadInterval = 300; // 0.3 секунди
@@ -225,7 +227,17 @@ GM_addStyle(`
         document.querySelector('.button-blocking-result.video').classList.remove('hidden-button');
     }
 
-    const addButtons = () => {
+    function resetStyles() {
+        document.querySelector('ytd-player#player video').classList.remove('blocked-video');
+        for (let button of document.querySelectorAll('.anti-moskal-button')) {
+            button.classList.remove('hidden-button');
+        }
+        for (let resultButton of document.querySelectorAll('.button-blocking-result')) {
+            resultButton.classList.add('hidden-button');
+        }
+    }
+
+    function addButtons() {
         const menu = document.querySelector('#experiment-overlay #actions');
 
         // Створюємо елемент кнопки "москальське відео"
@@ -290,6 +302,15 @@ GM_addStyle(`
             subtree: true,
         });
     }
+
+    // ################################
+    // Виконання коду
+    // ################################
+
+    // скинути стилі відео і кнопок при прокручуванні на інше відео
+    window.navigation.addEventListener("navigate", (event) => {
+        resetStyles();
+    });
 
     addButtonsWithAwait();
 })();
