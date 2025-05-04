@@ -114,76 +114,38 @@ GM_addStyle(`
     }
 
     // Очікує на появу елемента
-    function waitForElement(selector, callback, timeout = elementLoadTimeout) {
+    async function waitForElementAsync(selector, timeout = elementLoadTimeout) {
         const start = Date.now();
         const initialUrl = window.location.href;
-        const interval = setInterval(() => {
-            // припинити дію, якщо користувач прокрутив сторінку на інше відео
-            if (window.location.href !== initialUrl) {
-                clearInterval(interval);
-                return;
-            }
 
-            const el = typeof(selector) === 'function'
-                        ? selector()
-                        : document.querySelector(selector);
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+                // припинити дію, якщо користувач прокрутив сторінку на інше відео
+                if (window.location.href !== initialUrl) {
+                    clearInterval(interval);
+                    reject();
+                    return;
+                }
 
-            if (el) {
-                clearInterval(interval);
-                callback(el);
-            } else if (Date.now() - start > timeout) {
-                clearInterval(interval);
-                console.warn('waitForElement: Timeout for selector', selector);
-            }
-        }, elementLoadInterval);
-    }
-
-    function clickWithAwait(selector) {
-        function clickElement() {
-            const element = typeof(selector) === 'function'
+                const el = typeof(selector) === 'function'
                             ? selector()
                             : document.querySelector(selector);
-            if (element) {
-                element.click();
-            } else {
-                console.error('clickWithAwait: Element not found', selector);
-            }
-        };
 
-        const observer = new MutationObserver((mutations, obs) => {
-            waitForElement(selector, clickElement);
-            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
+                if (el) {
+                    clearInterval(interval);
+                    resolve();
+                } else if (Date.now() - start > timeout) {
+                    clearInterval(interval);
+                    reject();
+                    console.error('waitForElement: Timeout for selector', selector);
+                }
+            }, elementLoadInterval);
         });
     }
 
-    function inputTextWithAwait(selector, text) {
-        function typeText() {
-            const element = typeof(selector) === 'function'
-                            ? selector()
-                            : document.querySelector(selector);
-            if (element) {
-                element.value = text;
-                element.dispatchEvent(new Event('input', { bubbles: true }));
-            } else {
-                console.error('inputTextWithAwait: Element not found', selector);
-            }
-        };
-
-        const observer = new MutationObserver((mutations, obs) => {
-            waitForElement(selector, typeText);
-            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
-
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-        });
+    function inputText(element, text) {
+        element.value = text;
+        element.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
     function confirmIsUserLoggedIn() {
@@ -194,37 +156,64 @@ GM_addStyle(`
         return isLoggedIn;
     }
 
-    function reportVideo() {
-        if (!confirmIsUserLoggedIn()) {
-            return;
-        }
+    // function setReportProcessStarted() {
+    //     document.querySelector('ytd-player#player video').setAttribute('reporting-in-progress', true);
+    // }
 
-        // меню 3 крапки
-        clickWithAwait('#button-shape .yt-spec-touch-feedback-shape__fill');
+    // function setReportProcessFinished() {
+    //     document.querySelector('ytd-player#player video').removeAttribute('reporting-in-progress');
+    // }
 
-        // кнопка "Поскаржитись"
-        clickWithAwait('ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="m13.18 4 .24 1.2.16.8H19v7h-5.18l-.24-1.2-.16-.8H6V4h7.18M14 3H5v18h1v-9h6.6l.4 2h7V5h-5.6L14 3z"])');
-
-        // радіо "Пропаганда тероризму"
-        clickWithAwait('tp-yt-paper-radio-button[name="7"]');
-
-        // кнопка "Далі"
-        clickWithAwait('#submit-button .yt-spec-touch-feedback-shape__fill');
-
-        // ввести причину звітування "russian propaganda"
-        inputTextWithAwait('#textarea', 'russian propaganda');
-
-        // кнопка "Поскаржитися"
-        clickWithAwait('#submit-button .yt-spec-touch-feedback-shape__fill');
-
-        // кнопка "Вийти"
-        clickWithAwait('#confirm-button .yt-spec-touch-feedback-shape__fill');
-    }
+    // function isReportingInProgress() {
+    //     return document.querySelector('ytd-player#player video').hasAttribute('reporting-in-progress');
+    // }
 
     function markVideoAsReported() {
         document.querySelector('ytd-player#player video').classList.add('blocked-video');
         document.querySelector('.anti-moskal-button.video').classList.add('hidden-button');
         document.querySelector('.button-blocking-result.video').classList.remove('hidden-button');
+    }
+
+    async function reportVideoAsync(finishCallback = null) {
+        if (!confirmIsUserLoggedIn()) {
+            return;
+        }
+
+        // меню 3 крапки
+        const threeDotsButtonSelector = '#button-shape .yt-spec-touch-feedback-shape__fill';
+        await waitForElementAsync(threeDotsButtonSelector);
+        document.querySelector(threeDotsButtonSelector).click();
+
+        // кнопка "Поскаржитись"
+        const reportButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="m13.18 4 .24 1.2.16.8H19v7h-5.18l-.24-1.2-.16-.8H6V4h7.18M14 3H5v18h1v-9h6.6l.4 2h7V5h-5.6L14 3z"])';
+        await waitForElementAsync(reportButtonSelector);
+        document.querySelector(reportButtonSelector).click();
+
+        // радіо "Пропаганда тероризму"
+        const radioTerrorismSelector = 'tp-yt-paper-radio-button[name="7"]';
+        await waitForElementAsync(radioTerrorismSelector);
+        document.querySelector(radioTerrorismSelector).click();
+
+        // кнопка "Далі"
+        const nextButtonSelector = '#submit-button .yt-spec-touch-feedback-shape__fill';
+        await waitForElementAsync(nextButtonSelector);
+        document.querySelector(nextButtonSelector).click();
+
+        // ввести причину звітування "russian propaganda"
+        const reportReasonInputSelector = '#textarea';
+        await waitForElementAsync(reportReasonInputSelector);
+        const reportReasonInputElement = document.querySelector(reportReasonInputSelector);
+        inputText(reportReasonInputElement, 'russian propaganda');
+
+        // кнопка "Поскаржитися"
+        const submitButtonSelector = '#submit-button .yt-spec-touch-feedback-shape__fill';
+        await waitForElementAsync(submitButtonSelector);
+        document.querySelector(submitButtonSelector).click();
+
+        // кнопка "Вийти"
+        const exitButtonSelector = '#confirm-button .yt-spec-touch-feedback-shape__fill';
+        await waitForElementAsync(exitButtonSelector);
+        document.querySelector(exitButtonSelector).click();
     }
 
     function resetStyles() {
@@ -255,8 +244,13 @@ GM_addStyle(`
             pauseVideo();
 
             if (confirm('Поскаржитись на москальське відео?')) {
-                reportVideo();
-                markVideoAsReported();
+                reportVideoAsync()
+                    .then(() => {
+                        markVideoAsReported();
+                    })
+                    .catch((error) => {
+                        console.error('Виникла помилка при спробі поскаржитися на відео.', error);
+                    });
             }
         };
 
@@ -291,16 +285,9 @@ GM_addStyle(`
     }
 
     // Основна функція: відслідковує появу меню в shorts
-    function addButtonsWithAwait() {
-        const observer = new MutationObserver((mutations, obs) => {
-            waitForElement('#experiment-overlay #actions', addButtons);
-            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
-        });
-
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-        });
+    async function addButtonsAsync() {
+        await waitForElementAsync('#experiment-overlay #actions');
+        addButtons();
     }
 
     // ################################
@@ -312,5 +299,5 @@ GM_addStyle(`
         resetStyles();
     });
 
-    addButtonsWithAwait();
+    addButtonsAsync();
 })();
