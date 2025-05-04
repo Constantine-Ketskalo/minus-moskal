@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/
-// @version      1.1
+// @version      1.2
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і блокує канал. Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/shorts/*
@@ -230,7 +230,7 @@ GM_addStyle(`
     function addButtons() {
         const menu = document.querySelector('#experiment-overlay #actions');
 
-        // Створюємо елемент кнопки "москальське відео"
+        // Створюємо елемент кнопки "🚫 відео"
         const videoButtonWrapper = document.createElement('div');
         videoButtonWrapper.className = 'anti-moskal-button video';
 
@@ -260,7 +260,7 @@ GM_addStyle(`
         videoButtonResult.className = 'button-blocking-result video hidden-button';
         videoButtonResult.textContent = '✓';
 
-        // Створюємо елемент кнопки "москальський канал"
+        // Створюємо елемент кнопки "🚫 канал"
         const channelButtonWrapper = document.createElement('div');
         channelButtonWrapper.className = 'anti-moskal-button channel';
 
@@ -275,7 +275,7 @@ GM_addStyle(`
 
             pauseVideo();
 
-            if (confirm('Поскаржитись на москальське відео?')) {
+            if (confirm('Поскаржитись на москальське відео і видалити канал з рекомендацій?')) {
                 reportVideoAsync()
                     .then(() => {
                         return rejectChannelRecommendationAsync();
