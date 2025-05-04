@@ -156,7 +156,7 @@ GM_addStyle(`
         return isLoggedIn;
     }
 
-    function markVideoAsReported() {
+    async function markVideoAsReportedAsync() {
         document.querySelector('ytd-player#player video').classList.add('blocked-video');
         document.querySelector('.anti-moskal-button.video').classList.add('hidden-button');
         document.querySelector('.button-blocking-result.video').classList.remove('hidden-button');
@@ -204,6 +204,18 @@ GM_addStyle(`
         document.querySelector(exitButtonSelector).click();
     }
 
+    async function rejectChannelRecommendationAsync() {
+        // меню 3 крапки
+        const threeDotsButtonSelector = '#button-shape .yt-spec-touch-feedback-shape__fill';
+        await waitForElementAsync(threeDotsButtonSelector);
+        document.querySelector(threeDotsButtonSelector).click();
+
+        // кнопка "Не рекомендувати канал"
+        const notInterestedButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="M12 3c-4.96 0-9 4.04-9 9s4.04 9 9 9 9-4.04 9-9-4.04-9-9-9m0-1c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm7 11H5v-2h14v2z"])';
+        await waitForElementAsync(notInterestedButtonSelector);
+        document.querySelector(notInterestedButtonSelector).click();
+    }
+
     function resetStyles() {
         document.querySelector('ytd-player#player video').classList.remove('blocked-video');
         for (let button of document.querySelectorAll('.anti-moskal-button')) {
@@ -234,7 +246,7 @@ GM_addStyle(`
             if (confirm('Поскаржитись на москальське відео?')) {
                 reportVideoAsync()
                     .then(() => {
-                        markVideoAsReported();
+                        return markVideoAsReportedAsync();
                     })
                     .catch((error) => {
                         console.error('Виникла помилка при спробі поскаржитися на відео.', error);
@@ -263,7 +275,13 @@ GM_addStyle(`
             pauseVideo();
 
             if (confirm('Поскаржитись на москальське відео?')) {
-                alert('🔥 Готово! Канал відзначено як москальський.');
+                reportVideoAsync()
+                    .then(() => {
+                        return rejectChannelRecommendationAsync();
+                    })
+                    .catch((error) => {
+                        console.error('Виникла помилка при спробі поскаржитися на відео.', error);
+                    });
             }
         };
 
