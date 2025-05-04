@@ -2,7 +2,7 @@
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/
 // @version      1.0|2025-04-29
-// @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "мова ворожнечі" і блокує канал. Кнопка "🚫 відео" тільки звітує відео як "мова ворожнечі".
+// @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і блокує канал. Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/shorts/*
 // @icon         data:image/png;base64,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
@@ -61,54 +61,168 @@ GM_addStyle(`
         z-index: 1;
         padding: 10px;
     }
+
+    .button-blocking-result {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: #4CAF50; /* Зелений */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 24px;
+        font-weight: bold;
+        font-family: sans-serif;
+        user-select: none;
+        margin-top: 16px;
+    }
+
+    .button-blocking-result .video {
+        
+    }
+
+    .button-blocking-result .channel {
+
+    }
+
+    .hidden-button {
+        display: none;
+    }
+
+    .blocked-video {
+        opacity: 0.3;
+        filter: grayscale(100%);
+    }
 `);
 
 (function() {
     'use strict';
 
-    // 1. Унікальні москальські літери
-    const moskalUniqueLetters = ['ы', 'э', 'ё', 'ъ'];
+    console.log("I'm executud!", Date.now());
 
-    // 2. Часті москальські слова без унікальних літер
-    const moskalCommonWords = ['и', 'что', 'как', 'да', 'нет', 'она', 'они', 'из', 'с', 'к', 'года', 'также', 'или', 'будет', 'время', 'их', 'после', 'есть', 'более', 'только', 'еще', 'это', 'от', 'но', 'всегда', 'может', 'чтобы', 'если', 'тогда', 'где', 'когда', 'здесь'];
-
-    const ismoskalDomain = (url) => {
-        const hostname = new URL(url).hostname.toLowerCase();
-
-        return hostname.endsWith('.ru') ||
-                hostname.startsWith('ru.') ||
-                url.includes('/ru/')
-    };
-
-    const ismoskalText = (text) => {
-        text = text.toLowerCase();
-        
-        if (!text) {
-            return false;
-        }
-
-        for (const letter of moskalUniqueLetters) {
-            if (text.includes(letter)) {
-                return true;
-            }
-        }
-
-        for (const word of text.split(' ')) {
-            if (moskalCommonWords.includes(word)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    // ################
+    const elementLoadTimeout = 10000; // 10 секунд
+    const elementLoadInterval = 300; // 0.3 секунди
 
     const pauseVideo = () => {
         const videoElement = document.querySelector('video');
         if (videoElement) {
             videoElement.pause();
         }
+    }
+
+    // Очікує на появу елемента
+    function waitForElement(selector, callback, timeout = elementLoadTimeout) {
+        const start = Date.now();
+        const initialUrl = window.location.href;
+        const interval = setInterval(() => {
+            // припинити дію, якщо користувач прокрутив сторінку на інше відео
+            if (window.location.href !== initialUrl) {
+                clearInterval(interval);
+                return;
+            }
+
+            const el = typeof(selector) === 'function'
+                        ? selector()
+                        : document.querySelector(selector);
+
+            if (el) {
+                clearInterval(interval);
+                callback(el);
+            } else if (Date.now() - start > timeout) {
+                clearInterval(interval);
+                console.warn('waitForElement: Timeout for selector', selector);
+            }
+        }, elementLoadInterval);
+    }
+
+    function clickWithAwait(selector) {
+        function clickElement() {
+            const element = typeof(selector) === 'function'
+                            ? selector()
+                            : document.querySelector(selector);
+            if (element) {
+                element.click();
+            } else {
+                console.error('clickWithAwait: Element not found', selector);
+            }
+        };
+
+        const observer = new MutationObserver((mutations, obs) => {
+            waitForElement(selector, clickElement);
+            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    }
+
+    function inputTextWithAwait(selector, text) {
+        function typeText() {
+            const element = typeof(selector) === 'function'
+                            ? selector()
+                            : document.querySelector(selector);
+            if (element) {
+                element.value = text;
+                element.dispatchEvent(new Event('input', { bubbles: true }));
+            } else {
+                console.error('inputTextWithAwait: Element not found', selector);
+            }
+        };
+
+        const observer = new MutationObserver((mutations, obs) => {
+            waitForElement(selector, typeText);
+            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
+
+        });
+
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
+    }
+
+    function confirmIsUserLoggedIn() {
+        const isLoggedIn = document.querySelectorAll('#avatar-btn').length > 0;
+        if (!isLoggedIn) {
+            alert('Вам потрібно увійти в акаунт Google, щоб поскаржитися на відео.');
+        }
+        return isLoggedIn;
+    }
+
+    function reportVideo() {
+        if (!confirmIsUserLoggedIn()) {
+            return;
+        }
+
+        // меню 3 крапки
+        clickWithAwait('#button-shape .yt-spec-touch-feedback-shape__fill');
+
+        // кнопка "Поскаржитись"
+        clickWithAwait('ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="m13.18 4 .24 1.2.16.8H19v7h-5.18l-.24-1.2-.16-.8H6V4h7.18M14 3H5v18h1v-9h6.6l.4 2h7V5h-5.6L14 3z"])');
+
+        // радіо "Пропаганда тероризму"
+        clickWithAwait('tp-yt-paper-radio-button[name="7"]');
+
+        // кнопка "Далі"
+        clickWithAwait('#submit-button .yt-spec-touch-feedback-shape__fill');
+
+        // ввести причину звітування "russian propaganda"
+        inputTextWithAwait('#textarea', 'russian propaganda');
+
+        // кнопка "Поскаржитися"
+        clickWithAwait('#submit-button .yt-spec-touch-feedback-shape__fill');
+
+        // кнопка "Вийти"
+        clickWithAwait('#confirm-button .yt-spec-touch-feedback-shape__fill');
+    }
+
+    function markVideoAsReported() {
+        document.querySelector('ytd-player#player video').classList.add('blocked-video');
+        document.querySelector('.anti-moskal-button.video').classList.add('hidden-button');
+        document.querySelector('.button-blocking-result.video').classList.remove('hidden-button');
     }
 
     const addButtons = () => {
@@ -129,9 +243,15 @@ GM_addStyle(`
             pauseVideo();
 
             if (confirm('Поскаржитись на москальське відео?')) {
-                alert('🔥 Готово! Відео відзначено як москальське.');
+                reportVideo();
+                markVideoAsReported();
             }
         };
+
+        // Створюємо елемент кнопки відео успішно заблоковане
+        const videoButtonResult = document.createElement('div');
+        videoButtonResult.className = 'button-blocking-result video hidden-button';
+        videoButtonResult.textContent = '✓';
 
         // Створюємо елемент кнопки "москальський канал"
         const channelButtonWrapper = document.createElement('div');
@@ -154,37 +274,22 @@ GM_addStyle(`
         };
 
         menu.appendChild(videoButtonWrapper);
+        menu.appendChild(videoButtonResult);
         menu.appendChild(channelButtonWrapper);
     }
 
-    // Очікує на появу елемента
-    function waitForElement(selector, callback, timeout = 10000) {
-    const start = Date.now();
-    const interval = setInterval(() => {
-        const el = document.querySelector(selector);
-        if (el) {
-        clearInterval(interval);
-        callback(el);
-        } else if (Date.now() - start > timeout) {
-        clearInterval(interval);
-        console.warn('waitForElement: Timeout for selector', selector);
-        }
-    }, 300);
-    }
-
     // Основна функція: відслідковує появу меню в shorts
-    function observeShortsMenu() {
-    const observer = new MutationObserver((mutations, obs) => {
-        waitForElement('#experiment-overlay #actions', addButtons);
-        obs.disconnect(); // Зупиняємо спостереження після першого виявлення
-    });
+    function addButtonsWithAwait() {
+        const observer = new MutationObserver((mutations, obs) => {
+            waitForElement('#experiment-overlay #actions', addButtons);
+            obs.disconnect(); // Зупиняємо спостереження після першого виявлення
+        });
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-    });
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+        });
     }
 
-    // Запускаємо
-    observeShortsMenu();
+    addButtonsWithAwait();
 })();
