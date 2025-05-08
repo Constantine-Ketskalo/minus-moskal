@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: переклад результатів пошуку
-// @namespace    https://constantine-ketskalo.azurewebsites.net/uk/
-// @version      1.3
+// @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
+// @version      1.4
 // @description  Визначає результати пошуку москальською мовою. Коли знаходить, то робить їх сірими. Якщо біля результату пошуку є посилання "Перекласти цю сторінку", то підсвічує її для кращої видимості. Попередження! Для того, щоб коректно відображалось це посилання "Перекласти цю сторінку" і переклад був саме на українську, знадобиться зробити правильні налаштування в інших місцях: налаштування пошуку гугл (на сторінці https://www.google.com/preferences?hl=uk&lang=1), можливо також мова браузера і облікового запису гугл.
 // @author       Constantine Ketskalo
 // @match        http*://www.google.com/search*
