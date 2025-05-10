@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.6
+// @version      1.7
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -111,7 +111,7 @@ GM_addStyle(`
     const ELEMENT_LOAD_TIMEOUT_SEC = 10000; // 10 секунд
     const ELEMENT_LOAD_INTERVAL_MS = 300; // 0.3 секунди
 
-    function pauseVideo() {
+    async function pauseVideoAsync() {
         const videoElement = document.querySelector('video');
         if (videoElement) {
             videoElement.pause();
@@ -246,12 +246,12 @@ GM_addStyle(`
 
         videoButtonWrapper.appendChild(videoText);
 
-        videoButtonWrapper.onclick = (event) => {
+        videoButtonWrapper.onclick = async (event) => {
             event.preventDefault();
-            pauseVideo();
+            await pauseVideoAsync();
 
             if (confirm('Поскаржитись на москальське відео?')) {
-                reportVideoAsync()
+                await reportVideoAsync()
                     .then(() => {
                         return markVideoAsReportedAsync();
                     })
@@ -276,13 +276,13 @@ GM_addStyle(`
 
         channelButtonWrapper.appendChild(channelText);
 
-        channelButtonWrapper.onclick = (event) => {
+        channelButtonWrapper.onclick = async (event) => {
             event.preventDefault();
 
-            pauseVideo();
+            await pauseVideoAsync();
 
             if (confirm('Поскаржитись на москальське відео і видалити канал з рекомендацій?')) {
-                reportVideoAsync()
+                await reportVideoAsync()
                     .then(() => {
                         return rejectChannelRecommendationAsync();
                     })
