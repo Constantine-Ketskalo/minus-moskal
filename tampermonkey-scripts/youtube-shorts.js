@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Мовний щит: youtube shorts
+// @name         Мовний щит: youtube shorts - local test
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
 // @version      1.6
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
@@ -19,22 +19,22 @@ GM_addStyle(`
         height: 40px;
         border-radius: 50%;
         text-align: center;
-        border: 4px solid red;
         cursor: pointer;
         overflow: hidden;
         padding: 0;
         font-size: 12px;
         font-weight: bold;
-        color: black;
         text-align: center;
         justify-content: center;
         align-items: center;
         display: flex;
-        opacity: 50%;
+        color: rgb(15, 15, 15);
+        border: 4px solid rgba(15, 15, 15, 0.5);
+        background-color: rgba(0,0,0,0.05);
     }
 
     .anti-moskal-button:hover {
-        opacity: 1;
+        border-color: red;
     }
 
     .anti-moskal-button::before {
@@ -42,16 +42,20 @@ GM_addStyle(`
         position: absolute;
         width: 40px;
         height: 4px;
-        background-color: red;
+        background-color: rgba(15, 15, 15, 0.5);
         transform: rotate(-45deg);
         pointer-events: none;
     }
 
-    .anti-moskal-button.video {
+        .anti-moskal-button:hover::before {
+            background-color: red;
+        }
+
+    .anti-moskal-button.video:hover {
         background: yellow;
     }
 
-    .anti-moskal-button.channel {
+    .anti-moskal-button.channel:hover {
         background: pink;
     }
 
