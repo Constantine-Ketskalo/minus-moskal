@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.8
+// @version      1.9
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -135,11 +135,7 @@ GM_addStyle(`
 
     // Очікує на появу елемента
     async function waitForElementAsync(selector, timeout = ELEMENT_LOAD_TIMEOUT_SEC) {
-        const start = Date.now();
-        const initialUrl = window.location.href;
-
         return waitForThingToHappenAsync(() => {
-            // перевіряємо, чи елемент з'явився
             const el = typeof(selector) === 'function'
                         ? selector()
                         : document.querySelector(selector);
@@ -167,7 +163,7 @@ GM_addStyle(`
         document.querySelector('.button-blocking-result.video').classList.remove('hidden-button');
     }
 
-    async function reportVideoAsync(finishCallback = null) {
+    async function reportVideoAsync() {
         if (!confirmIsUserLoggedIn()) {
             return;
         }
@@ -279,15 +275,17 @@ GM_addStyle(`
 
             await pauseVideoAsync();
 
-            if (confirm('Поскаржитись на москальське відео і видалити канал з рекомендацій?')) {
-                await reportVideoAsync()
-                    .then(() => {
-                        return rejectChannelRecommendationAsync();
-                    })
-                    .catch((error) => {
-                        console.error('Виникла помилка при спробі поскаржитися на відео.', error);
-                    });
+            if (!confirm('Поскаржитись на москальське відео і видалити канал з рекомендацій?')) {
+                return;
             }
+
+            const isVideoAlreadyReported = document.querySelector('.button-blocking-result.video:not(.hidden-button)');
+
+            if (!isVideoAlreadyReported) {
+                await reportVideoAsync();
+            }
+            
+            await rejectChannelRecommendationAsync();
         };
 
         menu.appendChild(videoButtonWrapper);
