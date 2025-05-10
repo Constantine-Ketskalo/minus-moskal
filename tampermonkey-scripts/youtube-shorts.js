@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.9
+// @version      1.10
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -112,7 +112,8 @@ GM_addStyle(`
     const ELEMENT_LOAD_INTERVAL_MS = 300; // 0.3 секунди
 
     async function pauseVideoAsync() {
-        const videoElement = document.querySelector('video');
+        let videoElement = document.querySelector('#shorts-container video');
+
         if (videoElement) {
             videoElement.pause();
         }
