@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.7
+// @version      1.8
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -118,36 +118,34 @@ GM_addStyle(`
         }
     }
 
+    async function waitForThingToHappenAsync(thing, timeout = ELEMENT_LOAD_TIMEOUT_SEC) {
+        const start = Date.now();
+        return new Promise((resolve, reject) => {
+            const interval = setInterval(() => {
+                if (thing()) {
+                    clearInterval(interval);
+                    resolve();
+                } else if (Date.now() - start > timeout) {
+                    clearInterval(interval);
+                    reject(`waitForThingToHappenAsync: Timeout for thing: ${thing}`);
+                }
+            }, ELEMENT_LOAD_INTERVAL_MS);
+        });
+    }
+
     // Очікує на появу елемента
     async function waitForElementAsync(selector, timeout = ELEMENT_LOAD_TIMEOUT_SEC) {
         const start = Date.now();
         const initialUrl = window.location.href;
 
-        return new Promise((resolve, reject) => {
-            const interval = setInterval(() => {
-                // припинити дію, якщо користувач прокрутив сторінку youtube shorts на інше відео
-                if (window.location.href.includes('youtube.com/shorts/') &&
-                    initialUrl.includes('youtube.com/shorts/') &&
-                    window.location.href !== initialUrl) {
-                    clearInterval(interval);
-                    reject();
-                    return;
-                }
+        return waitForThingToHappenAsync(() => {
+            // перевіряємо, чи елемент з'явився
+            const el = typeof(selector) === 'function'
+                        ? selector()
+                        : document.querySelector(selector);
 
-                const el = typeof(selector) === 'function'
-                            ? selector()
-                            : document.querySelector(selector);
-
-                if (el) {
-                    clearInterval(interval);
-                    resolve();
-                } else if (Date.now() - start > timeout) {
-                    clearInterval(interval);
-                    reject();
-                    console.error('waitForElement: Timeout for selector', selector);
-                }
-            }, ELEMENT_LOAD_INTERVAL_MS);
-        });
+            return el ? true : false;
+        }, timeout);
     }
 
     function inputText(element, text) {
@@ -223,7 +221,7 @@ GM_addStyle(`
         document.querySelector(notInterestedButtonSelector).click();
     }
 
-    async function resetStylesASync() {
+    async function resetStylesAsync() {
         document.querySelector('ytd-player#player video').classList.remove('blocked-video');
         for (let button of document.querySelectorAll('.anti-moskal-button')) {
             button.classList.remove('hidden-button');
@@ -301,18 +299,31 @@ GM_addStyle(`
     // Виконання коду
     // ################################
 
-    // скинути стилі відео і кнопок при прокручуванні на інше відео
+    // скинути стилі відео і кнопок при прокручуванні на інше відео shorts
+    // або додати кнопки, коли користувач переходить на shorts з основного ютубу
     window.navigation.addEventListener("navigate", async (event) => {
+        let initialUrl = window.location.href;
+        await waitForThingToHappenAsync(() => {
+            return window.location.href !== initialUrl;
+        });
+
+        if (!window.location.href.includes('youtube.com/shorts')) {
+            return;
+        }
+
         // дочекатись появи меню youtube shorts
         await waitForElementAsync('#experiment-overlay #actions')
-        .then(() => {
-            if (document.querySelectorAll('#experiment-overlay #actions .anti-moskal-button').length == 0) {
-                return addReportButtonsToShortsMenuAsync();
-            }
-            else {
-                return resetStylesASync();
-            }
-        });
+            .then(() => {
+                if (document.querySelectorAll('#experiment-overlay #actions .anti-moskal-button').length == 0) {
+                    return addReportButtonsToShortsMenuAsync();
+                }
+                else {
+                    return resetStylesAsync();
+                }
+            })
+            .catch((error) => {
+                console.error('waiting for youtube shorts menu failed', error);
+            });
     });
 
     // дочекатись появи меню youtube shorts
