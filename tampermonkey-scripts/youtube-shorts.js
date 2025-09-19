@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.10
+// @version      1.20
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -101,6 +101,13 @@ GM_addStyle(`
     }
 `);
 
+/* TODO 1 (1.1, 1.2):
+Коли висота екрану не дуже велика (наприклад 731 px), то кнопки стискаються вертикально і погано виглядають.
+Якщо обгорнути в додаткові дівки з потрібними класами, як в закоментованому коді, то вони не сплескуються по висоті,
+але виникає інша проблема: перший елемент в меню вилізає за меню наверх. Якщо пропорційно їх зменшувати в такій ситуації,
+то мало би виглядати добре. Але на разі спроби з flex-shrink тут не працюють. Допрацювати потім.
+ */
+
 (function() {
     'use strict';
 
@@ -111,6 +118,8 @@ GM_addStyle(`
     const ELEMENT_LOAD_TIMEOUT_SEC = 10000; // 10 секунд
     const ELEMENT_LOAD_INTERVAL_MS = 300; // 0.3 секунди
 
+    const youtubeShortsMenuSelector = '#experiment-overlay #actions';
+
     async function pauseVideoAsync() {
         let videoElement = document.querySelector('#shorts-container video');
 
@@ -119,7 +128,9 @@ GM_addStyle(`
         }
     }
 
-    async function waitForThingToHappenAsync(thing, timeout = ELEMENT_LOAD_TIMEOUT_SEC) {
+    async function waitForThingToHappenAsync(thing, errorMessage = undefined, timeout = undefined) {
+        timeout = timeout ?? ELEMENT_LOAD_TIMEOUT_SEC;
+
         const start = Date.now();
         return new Promise((resolve, reject) => {
             const interval = setInterval(() => {
@@ -128,21 +139,23 @@ GM_addStyle(`
                     resolve();
                 } else if (Date.now() - start > timeout) {
                     clearInterval(interval);
-                    reject(`waitForThingToHappenAsync: Timeout for thing: ${thing}`);
+                    reject(errorMessage ?? `waitForThingToHappenAsync: Timeout for thing: ${thing}`);
                 }
             }, ELEMENT_LOAD_INTERVAL_MS);
         });
     }
 
     // Очікує на появу елемента
-    async function waitForElementAsync(selector, timeout = ELEMENT_LOAD_TIMEOUT_SEC) {
+    async function waitForElementAsync(selector, errorMessage = undefined, timeout = undefined) {
         return waitForThingToHappenAsync(() => {
             const el = typeof(selector) === 'function'
                         ? selector()
                         : document.querySelector(selector);
 
             return el ? true : false;
-        }, timeout);
+        },
+        errorMessage,
+        timeout);
     }
 
     function inputText(element, text) {
@@ -171,50 +184,54 @@ GM_addStyle(`
 
         // меню 3 крапки
         const threeDotsButtonSelector = '#button-shape .yt-spec-touch-feedback-shape__fill';
-        await waitForElementAsync(threeDotsButtonSelector);
+        await waitForElementAsync(threeDotsButtonSelector, `Didn't find ${threeDotsButtonSelector}`);
         document.querySelector(threeDotsButtonSelector).click();
 
         // кнопка "Поскаржитись"
         const reportButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="m13.18 4 .24 1.2.16.8H19v7h-5.18l-.24-1.2-.16-.8H6V4h7.18M14 3H5v18h1v-9h6.6l.4 2h7V5h-5.6L14 3z"])';
-        await waitForElementAsync(reportButtonSelector);
+        await waitForElementAsync(reportButtonSelector, `Didn't find ${reportButtonSelector}`);
         document.querySelector(reportButtonSelector).click();
 
         // радіо "Пропаганда тероризму"
-        const radioTerrorismSelector = 'tp-yt-paper-radio-button[name="7"]';
-        await waitForElementAsync(radioTerrorismSelector);
+        const radioTerrorismSelector = '[id="radio:8"]';
+        await waitForElementAsync(radioTerrorismSelector, `Didn't find ${radioTerrorismSelector}`);
         document.querySelector(radioTerrorismSelector).click();
 
         // кнопка "Далі"
-        const nextButtonSelector = '#submit-button .yt-spec-touch-feedback-shape__fill';
-        await waitForElementAsync(nextButtonSelector);
+        const nextButtonSelector = '#bottom-bar button';
+        await waitForElementAsync(nextButtonSelector, `Didn't find ${nextButtonSelector}`);
         document.querySelector(nextButtonSelector).click();
 
         // ввести причину звітування "russian propaganda"
-        const reportReasonInputSelector = '#textarea';
-        await waitForElementAsync(reportReasonInputSelector);
+        const reportReasonInputSelector = 'textarea';
+        await waitForElementAsync(reportReasonInputSelector, `Didn't find ${reportReasonInputSelector}`);
         const reportReasonInputElement = document.querySelector(reportReasonInputSelector);
         inputText(reportReasonInputElement, 'russian propaganda');
 
         // кнопка "Поскаржитися"
-        const submitButtonSelector = '#submit-button .yt-spec-touch-feedback-shape__fill';
-        await waitForElementAsync(submitButtonSelector);
+        const submitButtonSelector = '#bottom-bar button';
+        await waitForElementAsync(submitButtonSelector, `Didn't find ${submitButtonSelector}`);
         document.querySelector(submitButtonSelector).click();
 
-        // кнопка "Вийти"
-        const exitButtonSelector = '#confirm-button .yt-spec-touch-feedback-shape__fill';
-        await waitForElementAsync(exitButtonSelector);
+        // індикатор зміни вікна
+        const indicatorImageSelector = '.ytWebReportFormConfirmationPageViewModelImageDialog';
+        await waitForElementAsync(indicatorImageSelector, `Didn't find ${indicatorImageSelector}`);
+
+        // кнопка "OK"
+        const exitButtonSelector = '#bottom-bar button';
+        await waitForElementAsync(exitButtonSelector, `Didn't find ${exitButtonSelector}`);
         document.querySelector(exitButtonSelector).click();
     }
 
     async function rejectChannelRecommendationAsync() {
         // меню 3 крапки
         const threeDotsButtonSelector = '#button-shape .yt-spec-touch-feedback-shape__fill';
-        await waitForElementAsync(threeDotsButtonSelector);
+        await waitForElementAsync(threeDotsButtonSelector, `Didn't find ${threeDotsButtonSelector}`);
         document.querySelector(threeDotsButtonSelector).click();
 
         // кнопка "Не рекомендувати канал"
         const notInterestedButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="M12 3c-4.96 0-9 4.04-9 9s4.04 9 9 9 9-4.04 9-9-4.04-9-9-9m0-1c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm7 11H5v-2h14v2z"])';
-        await waitForElementAsync(notInterestedButtonSelector);
+        await waitForElementAsync(notInterestedButtonSelector, `Didn't find ${notInterestedButtonSelector}`);
         document.querySelector(notInterestedButtonSelector).click();
     }
 
@@ -228,8 +245,37 @@ GM_addStyle(`
         }
     }
 
+    function fitItemsToMenuSize() {
+        return; // TODO 1.1
+
+        const menu = document.querySelector(youtubeShortsMenuSelector);
+
+        if (menu.areFittingStylesAssigned) {
+            return;
+        }
+
+        const menuItems = Array.from(document.querySelector('#experiment-overlay #actions').children);
+        /*const items = allItems.filter(el => {
+            const style = window.getComputedStyle(el);
+            return style.display !== 'none';
+        });*/
+
+        // const menuHeight = menu.clientHeight;
+        const menuItemsHeights = menuItems.map(item => item.clientHeight);
+
+        menu.style.display = 'flex';
+        menu.style.flexDirection = 'column';
+
+
+        menuItemsHeights.forEach((height, index, array) => {
+            menuItems[index].style.flex = '1 1 0';// `${height} ${height} ${height}`;
+        });
+
+        menu.areFittingStylesAssigned = true;
+    }
+
     async function addReportButtonsToShortsMenuAsync() {
-        const menu = document.querySelector('#experiment-overlay #actions');
+        const menu = document.querySelector(youtubeShortsMenuSelector);
 
         // Створюємо елемент кнопки "🚫 відео"
         const videoButtonWrapper = document.createElement('div');
@@ -257,9 +303,9 @@ GM_addStyle(`
         };
 
         // Створюємо елемент кнопки відео успішно заблоковане
-        const videoButtonResult = document.createElement('div');
-        videoButtonResult.className = 'button-blocking-result video hidden-button';
-        videoButtonResult.textContent = '✓';
+        const videoBlockingResult = document.createElement('div');
+        videoBlockingResult.className = 'button-blocking-result video hidden-button';
+        videoBlockingResult.textContent = '✓';
 
         // Створюємо елемент кнопки "🚫 канал"
         const channelButtonWrapper = document.createElement('div');
@@ -289,9 +335,28 @@ GM_addStyle(`
             await rejectChannelRecommendationAsync();
         };
 
+        // створення елементів для меню
         menu.appendChild(videoButtonWrapper);
-        menu.appendChild(videoButtonResult);
+        menu.appendChild(videoBlockingResult);
         menu.appendChild(channelButtonWrapper);
+
+        // TODO 1.2
+        /*function createMenuItemFrom(element) {
+            const menuItem = document.createElement('div');
+            menuItem.className = 'button-container style-scope ytd-reel-player-overlay-renderer';
+            menuItem.appendChild(element);
+            return menuItem;
+        }
+        
+        const videoButtonMenuItem = createMenuItemFrom(videoButtonWrapper);
+        const videoResultMenuItem = createMenuItemFrom(videoBlockingResult);
+        const channelButtonMenuItem = createMenuItemFrom(channelButtonWrapper);
+
+        menu.appendChild(videoButtonMenuItem);
+        menu.appendChild(videoResultMenuItem);
+        menu.appendChild(channelButtonMenuItem);*/
+
+        fitItemsToMenuSize();
     }
 
     // ################################
@@ -311,7 +376,7 @@ GM_addStyle(`
         }
 
         // дочекатись появи меню youtube shorts
-        await waitForElementAsync('#experiment-overlay #actions')
+        await waitForElementAsync(youtubeShortsMenuSelector, `Didn't find ${youtubeShortsMenuSelector}`)
             .then(() => {
                 if (document.querySelectorAll('#experiment-overlay #actions .anti-moskal-button').length == 0) {
                     return addReportButtonsToShortsMenuAsync();
@@ -326,7 +391,7 @@ GM_addStyle(`
     });
 
     // дочекатись появи меню youtube shorts
-    waitForElementAsync('#experiment-overlay #actions')
+    waitForElementAsync(youtubeShortsMenuSelector, `Didn't find ${youtubeShortsMenuSelector}`)
     .then(() => {
         if (document.querySelectorAll('#experiment-overlay #actions .anti-moskal-button').length == 0) {
             return addReportButtonsToShortsMenuAsync();
