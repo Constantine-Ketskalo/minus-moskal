@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Мовний щит: youtube shorts
 // @namespace    https://constantine-ketskalo.azurewebsites.net/uk/project/46
-// @version      1.20
+// @version      1.30
 // @description  Додає на сторінки youtube shorts 2 кнопки: "🚫 канал" і "🚫 відео". Обидві кнопки роблять за вас автоматичні дії, щоб ви не робили це вручну. Першим ділом обидві кнопки ставлять відео на паузу, щоб не відтворювати далі відео. Кнопка "🚫 канал" звітує відео як "пропаганда тероризму" і тицяє за вас "не рекомендувати канал". Кнопка "🚫 відео" тільки звітує відео як "пропаганда тероризму".
 // @author       Constantine Ketskalo
 // @match        https://www.youtube.com/*
@@ -101,11 +101,8 @@ GM_addStyle(`
     }
 `);
 
-/* TODO 1 (1.1, 1.2):
-Коли висота екрану не дуже велика (наприклад 731 px), то кнопки стискаються вертикально і погано виглядають.
-Якщо обгорнути в додаткові дівки з потрібними класами, як в закоментованому коді, то вони не сплескуються по висоті,
-але виникає інша проблема: перший елемент в меню вилізає за меню наверх. Якщо пропорційно їх зменшувати в такій ситуації,
-то мало би виглядати добре. Але на разі спроби з flex-shrink тут не працюють. Допрацювати потім.
+/* TODO: зробити 2 окремі функції: для звичайного ютубу і shorts.
+ По події зміни посилання вони активуються чи деактивуються, коли відбувається перемикання між звичайним ютубом і shorts.
  */
 
 (function() {
@@ -143,6 +140,16 @@ GM_addStyle(`
                 }
             }, ELEMENT_LOAD_INTERVAL_MS);
         });
+    }
+
+    function selectElementByText(text, containerCssSelector = undefined) {
+        const container = containerCssSelector ? document.querySelector(containerCssSelector) : document;
+        if (!container) {
+            return null;
+        }
+        // отримати по тексту через xpath, по точному тексту, цільовий елемент без дочірніх елементів
+        const xpath = `.//*/text()[normalize-space()="${text}"]/parent::*`;
+        return document.evaluate(xpath, container, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
     }
 
     // Очікує на появу елемента
@@ -188,29 +195,34 @@ GM_addStyle(`
         document.querySelector(threeDotsButtonSelector).click();
 
         // кнопка "Поскаржитись"
-        const reportButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="m13.18 4 .24 1.2.16.8H19v7h-5.18l-.24-1.2-.16-.8H6V4h7.18M14 3H5v18h1v-9h6.6l.4 2h7V5h-5.6L14 3z"])';
+        const reportButtonSelector = () => selectElementByText('Поскаржитись', 'ytd-popup-container');
         await waitForElementAsync(reportButtonSelector, `Didn't find ${reportButtonSelector}`);
-        document.querySelector(reportButtonSelector).click();
+        reportButtonSelector().scrollIntoView();
+        reportButtonSelector().click();
 
         // радіо "Пропаганда тероризму"
         const radioTerrorismSelector = '[id="radio:8"]';
         await waitForElementAsync(radioTerrorismSelector, `Didn't find ${radioTerrorismSelector}`);
+        document.querySelector(radioTerrorismSelector).scrollIntoView();
         document.querySelector(radioTerrorismSelector).click();
 
         // кнопка "Далі"
         const nextButtonSelector = '#bottom-bar button';
         await waitForElementAsync(nextButtonSelector, `Didn't find ${nextButtonSelector}`);
+        document.querySelector(nextButtonSelector).scrollIntoView();
         document.querySelector(nextButtonSelector).click();
 
         // ввести причину звітування "russian propaganda"
         const reportReasonInputSelector = 'textarea';
         await waitForElementAsync(reportReasonInputSelector, `Didn't find ${reportReasonInputSelector}`);
         const reportReasonInputElement = document.querySelector(reportReasonInputSelector);
+        reportReasonInputElement.scrollIntoView();
         inputText(reportReasonInputElement, 'russian propaganda');
 
         // кнопка "Поскаржитися"
         const submitButtonSelector = '#bottom-bar button';
         await waitForElementAsync(submitButtonSelector, `Didn't find ${submitButtonSelector}`);
+        document.querySelector(submitButtonSelector).scrollIntoView();
         document.querySelector(submitButtonSelector).click();
 
         // індикатор зміни вікна
@@ -220,6 +232,7 @@ GM_addStyle(`
         // кнопка "OK"
         const exitButtonSelector = '#bottom-bar button';
         await waitForElementAsync(exitButtonSelector, `Didn't find ${exitButtonSelector}`);
+        document.querySelector(exitButtonSelector).scrollIntoView();
         document.querySelector(exitButtonSelector).click();
     }
 
@@ -229,10 +242,11 @@ GM_addStyle(`
         await waitForElementAsync(threeDotsButtonSelector, `Didn't find ${threeDotsButtonSelector}`);
         document.querySelector(threeDotsButtonSelector).click();
 
-        // кнопка "Не рекомендувати канал"
-        const notInterestedButtonSelector = 'ytd-popup-container #items ytd-menu-service-item-renderer:has(svg path[d="M12 3c-4.96 0-9 4.04-9 9s4.04 9 9 9 9-4.04 9-9-4.04-9-9-9m0-1c5.52 0 10 4.48 10 10s-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2zm7 11H5v-2h14v2z"])';
+        // кнопка "Не рекомендувати цей канал"
+        const notInterestedButtonSelector = () => selectElementByText('Не рекомендувати цей канал', 'ytd-popup-container');
         await waitForElementAsync(notInterestedButtonSelector, `Didn't find ${notInterestedButtonSelector}`);
-        document.querySelector(notInterestedButtonSelector).click();
+        notInterestedButtonSelector().scrollIntoView();
+        notInterestedButtonSelector().click();
     }
 
     async function resetStylesAsync() {
@@ -243,35 +257,6 @@ GM_addStyle(`
         for (let resultButton of document.querySelectorAll('.button-blocking-result')) {
             resultButton.classList.add('hidden-button');
         }
-    }
-
-    function fitItemsToMenuSize() {
-        return; // TODO 1.1
-
-        const menu = document.querySelector(youtubeShortsMenuSelector);
-
-        if (menu.areFittingStylesAssigned) {
-            return;
-        }
-
-        const menuItems = Array.from(document.querySelector('#experiment-overlay #actions').children);
-        /*const items = allItems.filter(el => {
-            const style = window.getComputedStyle(el);
-            return style.display !== 'none';
-        });*/
-
-        // const menuHeight = menu.clientHeight;
-        const menuItemsHeights = menuItems.map(item => item.clientHeight);
-
-        menu.style.display = 'flex';
-        menu.style.flexDirection = 'column';
-
-
-        menuItemsHeights.forEach((height, index, array) => {
-            menuItems[index].style.flex = '1 1 0';// `${height} ${height} ${height}`;
-        });
-
-        menu.areFittingStylesAssigned = true;
     }
 
     async function addReportButtonsToShortsMenuAsync() {
@@ -339,24 +324,6 @@ GM_addStyle(`
         menu.appendChild(videoButtonWrapper);
         menu.appendChild(videoBlockingResult);
         menu.appendChild(channelButtonWrapper);
-
-        // TODO 1.2
-        /*function createMenuItemFrom(element) {
-            const menuItem = document.createElement('div');
-            menuItem.className = 'button-container style-scope ytd-reel-player-overlay-renderer';
-            menuItem.appendChild(element);
-            return menuItem;
-        }
-        
-        const videoButtonMenuItem = createMenuItemFrom(videoButtonWrapper);
-        const videoResultMenuItem = createMenuItemFrom(videoBlockingResult);
-        const channelButtonMenuItem = createMenuItemFrom(channelButtonWrapper);
-
-        menu.appendChild(videoButtonMenuItem);
-        menu.appendChild(videoResultMenuItem);
-        menu.appendChild(channelButtonMenuItem);*/
-
-        fitItemsToMenuSize();
     }
 
     // ################################
